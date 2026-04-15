@@ -1,49 +1,41 @@
-#include <iostream> //skonczone
-#include <vector>
+#include <iostream>
+#include "baza.h"
 
 using namespace std;
 
-struct Wpis {
-    string imie;
-    string nazwisko;
-    long long numer_telefonu;
-};
-
-class baza_danych {
-    private:
-        vector<Wpis> tablica_wpisow;
-    public:
-    void wyswietl_baze();
-    void usun_wpis(int indeks);
-    void dodaj_wpis(const Wpis &nowy_wpis);
-};
-
-void baza_danych::wyswietl_baze() {
-    cout << "\nKsiazka Telefoniczna: " << endl;
-    if (tablica_wpisow.size() == 0) {
-        cout << "Baza jest pusta." << endl;
-    } else {
-        for (int i = 0; i < tablica_wpisow.size(); i++) {
-            cout << "[" << i << "] " << tablica_wpisow[i].imie
-                 << " " << tablica_wpisow[i].nazwisko
-                 << " Tel: " <<tablica_wpisow[i].numer_telefonu << endl;
-        }
-    }
-}
-void baza_danych::usun_wpis(int indeks) {
-    if (indeks < 0 || indeks >= tablica_wpisow.size()) {
-        cout << "Błąd: Niepoprawny indeks!" << endl;
-        return;
-    }
-    tablica_wpisow.erase(tablica_wpisow.begin() + indeks);
-    cout << "Wpis zostal usuniety." << endl;
-}
-void baza_danych::dodaj_wpis(const Wpis &nowy) {
-    tablica_wpisow.push_back(nowy);
-}
-
 int main() {
     baza_danych baza_glowna;
+
+
+    baza_glowna.dodaj_wpis(Wpis{"Adrian", "Starostka", 123456789L});
+    baza_glowna.dodaj_wpis(Wpis{"Adrian", "Kowalski", 987654321L}); // To samo imię
+    baza_glowna.dodaj_wpis(Wpis{"Anna", "Nowak", 111222333L});
+    baza_glowna.dodaj_wpis(Wpis{"Maria", "Nowak", 444555666L});    // To samo nazwisko
+
+    string Wpis::* wsk_nazwisko = &Wpis::nazwisko;
+    string Wpis::* wsk_imie = &Wpis::imie;
+
+    vector<Wpis*> znalezieni_nazwisko = baza_glowna.szukaj("Nowak", wsk_nazwisko);
+
+    if(znalezieni_nazwisko.empty()) {
+        cout << "Nie znaleziono nikogo o takim nazwisku." << endl;
+    } else {
+        for(Wpis* w : znalezieni_nazwisko) {
+            cout << "Znaleziono: " << w->imie << " " << w->nazwisko << ", Tel: " << w->numer_telefonu << endl;
+        }
+    }
+
+    vector<Wpis*> znalezieni_imie = baza_glowna.szukaj("Adrian", wsk_imie);
+
+    if(znalezieni_imie.empty()) {
+        cout << "Nie znaleziono nikogo o takim imieniu." << endl;
+    } else {
+        for(Wpis* w : znalezieni_imie) {
+            cout << "Znaleziono: " << w->imie << " " << w->nazwisko << ", Tel: " << w->numer_telefonu << endl;
+        }
+    }
+
+
     int wybor;
     do {
         cout << "\nMENU: " << endl;
